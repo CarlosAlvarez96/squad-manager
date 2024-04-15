@@ -63,4 +63,6 @@ class UserController extends AbstractController
         // Devuelve una respuesta de éxito
         return new JsonResponse(['message' => 'User registered successfully'], Response::HTTP_CREATED);
     }
+
+    
 }
