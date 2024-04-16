@@ -36,7 +36,30 @@ class UserController extends AbstractController
         // Devuelve una respuesta JSON con todos los usuarios
         return new JsonResponse($formattedUsers);
     }
-    
+    #[Route('/{id}', name: 'user_get', methods: ['GET'])]
+    public function getUserById(int $id, EntityManagerInterface $entityManager): JsonResponse
+    {
+        // Obtiene el repositorio de la entidad User
+        $userRepository = $entityManager->getRepository(User::class);
+
+        // Busca el usuario por su ID
+        $user = $userRepository->find($id);
+
+        // Verifica si el usuario existe
+        if (!$user) {
+            return new JsonResponse(['error' => 'User not found'], Response::HTTP_NOT_FOUND);
+        }
+
+        // Formatea los datos del usuario para la respuesta
+        $formattedUser = [
+            'id' => $user->getId(),
+            'email' => $user->getEmail(),
+            'roles' => $user->getRoles() // Puedes incluir otros campos si lo deseas
+        ];
+
+        // Devuelve una respuesta JSON con el usuario encontrado
+        return new JsonResponse($formattedUser);
+    }
     #[Route('/register', name: 'user_register', methods: ['POST'])]
     public function register(Request $request, EntityManagerInterface $entityManager, UserPasswordHasherInterface $passwordHasher): Response
     {

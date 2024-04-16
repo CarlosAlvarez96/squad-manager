@@ -14,7 +14,7 @@ class ParticipantStats
     private ?int $id = null;
 
     #[ORM\ManyToOne(inversedBy: 'participantStats')]
-    private ?Participant $partipant = null;
+    private ?Participant $participant = null; // Corregido el nombre de la propiedad
 
     #[ORM\Column(nullable: true)]
     private ?int $goals = null;
@@ -33,14 +33,14 @@ class ParticipantStats
         return $this->id;
     }
 
-    public function getPartipant(): ?Participant
+    public function getParticipant(): ?Participant
     {
-        return $this->partipant;
+        return $this->participant;
     }
 
-    public function setPartipant(?Participant $partipant): self
+    public function setParticipant(?Participant $participant): self
     {
-        $this->partipant = $partipant;
+        $this->participant = $participant;
 
         return $this;
     }
