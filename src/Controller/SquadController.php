@@ -83,4 +83,58 @@ class SquadController extends AbstractController
         // Devuelve una respuesta JSON con la escuadra encontrada
         return new JsonResponse($formattedSquad);
     }
+    
+    #[Route('/{id}', name: 'squad_update', methods: ['PUT'])]
+    public function updateSquad(int $id, Request $request, EntityManagerInterface $entityManager): Response
+    {
+        // Obtiene el repositorio de la entidad Squad
+        $squadRepository = $entityManager->getRepository(Squad::class);
+
+        // Busca la escuadra por su ID
+        $squad = $squadRepository->find($id);
+
+        // Verifica si la escuadra existe
+        if (!$squad) {
+            return new JsonResponse(['error' => 'Squad not found'], Response::HTTP_NOT_FOUND);
+        }
+
+        // Obtiene los datos del cuerpo de la solicitud
+        $data = json_decode($request->getContent(), true);
+
+        // Verifica si se ha proporcionado el nombre de la escuadra
+        if (!isset($data['name'])) {
+            return new JsonResponse(['error' => 'Squad name is required'], Response::HTTP_BAD_REQUEST);
+        }
+
+        // Actualiza el nombre de la escuadra
+        $squad->setName($data['name']);
+
+        // Guarda los cambios en la base de datos
+        $entityManager->flush();
+
+        // Devuelve una respuesta de éxito
+        return new JsonResponse(['message' => 'Squad updated successfully'], Response::HTTP_OK);
+    }
+
+    #[Route('/{id}', name: 'squad_delete', methods: ['DELETE'])]
+    public function deleteSquad(int $id, EntityManagerInterface $entityManager): Response
+    {
+        // Obtiene el repositorio de la entidad Squad
+        $squadRepository = $entityManager->getRepository(Squad::class);
+
+        // Busca la escuadra por su ID
+        $squad = $squadRepository->find($id);
+
+        // Verifica si la escuadra existe
+        if (!$squad) {
+            return new JsonResponse(['error' => 'Squad not found'], Response::HTTP_NOT_FOUND);
+        }
+
+        // Elimina la escuadra de la base de datos
+        $entityManager->remove($squad);
+        $entityManager->flush();
+
+        // Devuelve una respuesta de éxito
+        return new JsonResponse(['message' => 'Squad deleted successfully'], Response::HTTP_OK);
+    }
 }
