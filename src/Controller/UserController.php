@@ -4,6 +4,7 @@ namespace App\Controller;
 
 use App\Entity\User;
 use Doctrine\ORM\EntityManagerInterface;
+use Nelmio\CorsBundle\Annotation\Cors;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -38,6 +39,7 @@ class UserController extends AbstractController
     }
     #[Route('/{id}', name: 'user_get', methods: ['GET'])]
     public function getUserById(int $id, EntityManagerInterface $entityManager): JsonResponse
+
     {
         // Obtiene el repositorio de la entidad User
         $userRepository = $entityManager->getRepository(User::class);

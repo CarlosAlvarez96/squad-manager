@@ -8,6 +8,7 @@ import Register from "./pages/Register";
 import { AuthProvider } from "./context/AuthContext";
 import RegistMember from "./components/RegistMember";
 
+
 function App() {
   const router = createBrowserRouter([
     {
