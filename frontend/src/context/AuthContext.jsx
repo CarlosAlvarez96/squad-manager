@@ -11,11 +11,14 @@ export const AuthProvider = ({ children }) => {
     localStorage.setItem("token", newToken);
     localStorage.setItem("email", userEmail);
     localStorage.setItem("username", username);
-    localStorage.setItem("password", password);
+    localStorage.setItem('password', password);
   };
 
   const logout = () => {
     setToken(null);
+    localStorage.setItem("email", '');
+    localStorage.setItem("username", '');
+    localStorage.setItem("password", '');
     localStorage.removeItem("token");
   };
 

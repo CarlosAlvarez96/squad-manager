@@ -4,13 +4,17 @@ namespace App\Controller;
 
 use App\Entity\User;
 use Doctrine\ORM\EntityManagerInterface;
-use Nelmio\CorsBundle\Annotation\Cors;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
+use Lexik\Bundle\JWTAuthenticationBundle\Services\JWTTokenManagerInterface;
+use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
+use Symfony\Component\Serializer\SerializerInterface;
+use App\Repository\UserRepository;
+
 
 #[Route('/user', name: 'app_user')]
 class UserController extends AbstractController
@@ -88,6 +92,23 @@ class UserController extends AbstractController
         // Devuelve una respuesta de éxito
         return new JsonResponse(['message' => 'User registered successfully'], Response::HTTP_CREATED);
     }
+    #[Route('/api/getuserinfo', name: 'app_get_user_info', methods: ['POST'])]
+    public function getUserInfo(SerializerInterface $serializerInterface, JWTTokenManagerInterface $jwtManagerInterface, TokenStorageInterface $tokenStorageInterface, UserRepository $userRepository): Response
+    {
+        $decodedToken = $jwtManagerInterface->decode($tokenStorageInterface->getToken());
+        // Obtener el username del usuario desde el token decodificado
+        $username = $decodedToken['username'];
+        // Buscar el usuario en la base de datos usando el username obtenido
+        $user = $userRepository->findOneBy(['username' => $username]);
+        // Devolver los datos del usuario en la respuesta HTTP
+        $response =  $serializerInterface->serialize([
+            'username' => $user->getUsername(),
+            'id' => $user->getId(),
+        ], 'json');
+ 
+        return new JsonResponse($response, 200, [
+            'Content-Type' => 'application/json',
+        ], true);
+    }
 
-    
 }
