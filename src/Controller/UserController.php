@@ -115,14 +115,15 @@ class UserController extends AbstractController
         // Obtiene los datos del cuerpo de la solicitud
         $data = json_decode($request->getContent(), true);
 
-        // Verifica si se han proporcionado el correo electrónico y la contraseña
-        if (!isset($data['email']) || !isset($data['password'])) {
-            return new JsonResponse(['error' => 'Email and password are required'], Response::HTTP_BAD_REQUEST);
+        // Verifica si se han proporcionado el correo electrónico, la contraseña y el nombre de usuario
+        if (!isset($data['email']) || !isset($data['password']) || !isset($data['username'])) {
+            return new JsonResponse(['error' => 'Email, username, and password are required'], Response::HTTP_BAD_REQUEST);
         }
 
         // Crea una nueva instancia de la entidad User
         $user = new User();
         $user->setEmail($data['email']);
+        $user->setUsername($data['username']);  // Asegúrate de asignar el nombre de usuario
 
         // Codifica la contraseña
         $encodedPassword = $passwordHasher->hashPassword($user, $data['password']);
@@ -135,6 +136,7 @@ class UserController extends AbstractController
         // Devuelve una respuesta de éxito
         return new JsonResponse(['message' => 'User registered successfully'], Response::HTTP_CREATED);
     }
+
     #[Route('/api/getuserinfo', name: 'app_get_user_info', methods: ['POST'])]
     public function getUserInfo(SerializerInterface $serializerInterface, JWTTokenManagerInterface $jwtManagerInterface, TokenStorageInterface $tokenStorageInterface, UserRepository $userRepository): Response
     {

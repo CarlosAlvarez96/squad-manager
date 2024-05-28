@@ -53,8 +53,9 @@ const Register = () => {
     }
 
     try {
+      console.log("Registering user:", formData);
       const response = await axios.post(
-        "https://wondernotes.onrender.com/jwtauth/register",
+        "http://localhost/user/register",
         {
           username: formData.username,
           email: formData.email,
