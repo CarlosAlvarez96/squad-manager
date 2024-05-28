@@ -3,7 +3,7 @@ import React from 'react';
 const Squad = () => {
     return (
         <div>
-            {/* Your component content goes here */}
+            <p>Hola</p>
         </div>
     );
 };

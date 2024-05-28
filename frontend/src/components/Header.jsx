@@ -48,11 +48,11 @@ const Header = () => {
   };
 
   return (
-    <div className={`bg-gray-200`}>
+    <div className={`bg-green-500`}>
       <div className="flex flex-col md:flex-row justify-between items-center p-4 border-b-2">
         <div className="flex items-center">
           <h2 className={`text-4xl font-bold p-2 m-2 `}>
-            Squad Builder
+            Squad Manager
           </h2>
         </div>
         <button
@@ -82,13 +82,13 @@ const Header = () => {
             </button>
             <button
               onClick={handleSquad}
-              className={`p-2 rounded-lg hover:bg-${hoverClass}`}
+              className={`p-2 rounded-lg hover:bg-green-700 text-white text-lg border border-transparent focus:outline-none focus:border-green-700 focus:ring-2 focus:ring-green-700`}
             >
-              Squad
+              My Squad
             </button>
             <button
               onClick={handleAddMember}
-              className={`p-2 rounded-lg hover:bg-${hoverClass}`}
+              className={`p-2 rounded-lg hover:bg-green-700 text-white text-lg border border-transparent focus:outline-none focus:border-green-700 focus:ring-2 focus:ring-green-700`}
             >
               Add member
             </button>
@@ -96,14 +96,14 @@ const Header = () => {
               <div>
                 <button
                   onClick={handleLogin}
-                  className={`p-2 rounded-lg hover:bg-${hoverClass}`}
+                  className={`p-2 rounded-lg hover:bg-green-700 text-white text-lg border border-transparent focus:outline-none focus:border-green-700 focus:ring-2 focus:ring-green-700`}
                     onMouseLeave={resetHoverClass}
                 >
                   Login
                 </button>
                 <button
                   onClick={handleRegister}
-                  className={`p-2 rounded-lg hover:bg-${hoverClass}`}
+                  className={`p-2 rounded-lg hover:bg-green-700 text-white text-lg border border-transparent focus:outline-none focus:border-green-700 focus:ring-2 focus:ring-green-700`}
                     onMouseLeave={resetHoverClass}
                 >
                   Register
@@ -113,7 +113,7 @@ const Header = () => {
             {token && (
               <button
                 onClick={handleLogout}
-                className={`p-2 rounded-lg hover:bg-${hoverClass}`}
+                className={`p-2 rounded-lg hover:bg-green-700 text-white text-lg border border-transparent focus:outline-none focus:border-green-700 focus:ring-2 focus:ring-green-700`}
                 onMouseLeave={resetHoverClass}
               >
                 Logout
@@ -125,5 +125,6 @@ const Header = () => {
     </div>
   );
 };
+
 
 export default Header;

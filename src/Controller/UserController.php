@@ -19,6 +19,49 @@ use App\Repository\UserRepository;
 #[Route('/user', name: 'app_user')]
 class UserController extends AbstractController
 {
+    #[Route('/me', name: 'user_me', methods: ['GET'])]
+    public function getMe(Request $request, JWTTokenManagerInterface $jwtManager, UserRepository $userRepository): JsonResponse
+    {
+        // Obtiene el token desde la cabecera de la solicitud
+        $authHeader = $request->headers->get('Authorization');
+        if (!$authHeader || !preg_match('/Bearer\s(\S+)/', $authHeader, $matches)) {
+            return new JsonResponse(['error' => 'Token not found'], JsonResponse::HTTP_UNAUTHORIZED);
+        }
+
+        $token = $matches[1];
+
+        // Decodifica el token JWT
+        try {
+            $decodedToken = $jwtManager->parse($token);
+        } catch (\Exception $e) {
+            return new JsonResponse(['error' => 'Invalid token'], JsonResponse::HTTP_UNAUTHORIZED);
+        }
+
+        // Verifica que el token tenga un campo de email
+        if (!isset($decodedToken['email'])) {
+            return new JsonResponse(['error' => 'Invalid token payload'], JsonResponse::HTTP_UNAUTHORIZED);
+        }
+
+        $email = $decodedToken['email'];
+
+        // Busca el usuario en la base de datos utilizando el email
+        $user = $userRepository->findOneBy(['email' => $email]);
+        if (!$user) {
+            return new JsonResponse(['error' => 'User not found'], JsonResponse::HTTP_NOT_FOUND);
+        }
+
+        // Formatea los datos del usuario para la respuesta
+        $formattedUser = [
+            'id' => $user->getId(),
+            'email' => $user->getEmail(),
+            'username' => $user->getUsername(),
+            'roles' => $user->getRoles()
+        ];
+
+        // Devuelve una respuesta JSON con los datos del usuario
+        return new JsonResponse($formattedUser);
+    }
+
     #[Route('/all', name: 'user_all', methods: ['GET'])]
     public function getAllUsers(EntityManagerInterface $entityManager): JsonResponse
     {

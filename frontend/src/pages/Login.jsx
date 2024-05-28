@@ -4,9 +4,9 @@ import { useNavigate } from 'react-router-dom';
 import Swal from 'sweetalert2';
 
 const Login = () => {
-  const [username, setUsername] = useState('');
+  const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const { login, setEmail } = useAuth();
+  const { login, setEmail: setAuthEmail } = useAuth();
   const navigate = useNavigate();
 
   const handleSubmit = async (e) => {
@@ -18,7 +18,7 @@ const Login = () => {
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ email: username, password }),
+        body: JSON.stringify({ email, password }),
       });
   
       if (!response.ok) {
@@ -28,7 +28,7 @@ const Login = () => {
       const data = await response.json();
       const accessToken = data.token;
   
-      login(accessToken);
+      login(accessToken, email, password, email); 
   
       const userResponse = await fetch('http://localhost/user/me', {
         headers: {
@@ -38,12 +38,12 @@ const Login = () => {
   
       const userData = await userResponse.json();
       const userEmail = userData.email || 'default@example.com';
-      setEmail(userEmail);
+      setAuthEmail(userEmail);
   
       Swal.fire({
         icon: 'success',
         title: 'Login successful',
-        text: `Welcome, ${userData.username || 'User'}!`,
+        text: `Welcome, ${userData.email || 'User'}!`,
       });
   
       navigate('/');
@@ -64,16 +64,16 @@ const Login = () => {
         <h2 className="block mb-4 text-2xl font-medium">Sign in</h2>
         <hr className="mb-10" />
         <div className="mb-5">
-          <label htmlFor="username" className="block mb-2 text-sm font-medium">
-            Username
+          <label htmlFor="email" className="block mb-2 text-sm font-medium">
+            Email
           </label>
           <input
-            type="text"
-            id="username"
-            value={username}
-            onChange={(e) => setUsername(e.target.value)}
+            type="email"
+            id="email"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
             className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5"
-            placeholder="John Doe"
+            placeholder="example@example.com"
             required
           />
         </div>
