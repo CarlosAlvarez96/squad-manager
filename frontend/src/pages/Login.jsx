@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { useNavigate } from 'react-router-dom';
 import Swal from 'sweetalert2';
@@ -9,9 +9,17 @@ const Login = () => {
   const { login, setEmail: setAuthEmail } = useAuth();
   const navigate = useNavigate();
 
+  // Cargar datos de inicio de sesión desde el almacenamiento local cuando el componente se monta
+  useEffect(() => {
+    const storedEmail = localStorage.getItem('email');
+    if (storedEmail) {
+      setEmail(storedEmail);
+    }
+  }, []);
+
   const handleSubmit = async (e) => {
     e.preventDefault();
-  
+
     try {
       const response = await fetch('http://localhost/api/login_check', {
         method: 'POST',
@@ -20,32 +28,35 @@ const Login = () => {
         },
         body: JSON.stringify({ email, password }),
       });
-  
+
       if (!response.ok) {
         throw new Error('Login failed');
       }
-  
+
       const data = await response.json();
       const accessToken = data.token;
-  
-      login(accessToken, email, password, email); 
-  
+
+      login(accessToken, email, password, email);
+
       const userResponse = await fetch('http://localhost/user/me', {
         headers: {
           Authorization: `Bearer ${accessToken}`,
         },
       });
-  
+
       const userData = await userResponse.json();
       const userEmail = userData.email || 'default@example.com';
       setAuthEmail(userEmail);
-  
+
+      // Guardar email en el almacenamiento local
+      localStorage.setItem('email', userEmail);
+
       Swal.fire({
         icon: 'success',
         title: 'Login successful',
         text: `Welcome, ${userData.email || 'User'}!`,
       });
-  
+
       navigate('/');
     } catch (error) {
       console.error('Login failed', error);
@@ -56,7 +67,6 @@ const Login = () => {
       });
     }
   };
-  
 
   return (
     <div className="mt-20">
@@ -77,7 +87,7 @@ const Login = () => {
             required
           />
         </div>
-  
+
         <div className="mb-5">
           <label htmlFor="password" className="block mb-2 text-sm font-medium">
             Password

@@ -3,19 +3,14 @@ import { createContext, useContext, useState, useEffect } from "react";
 const AuthContext = createContext();
 
 export const AuthProvider = ({ children }) => {
-  const [token, setToken] = useState(sessionStorage.getItem("token") || null);
-  const [email, setEmailState] = useState(sessionStorage.getItem("email") || null);
-  const [filteredTag, setFilteredTag] = useState();
+  const [token, setToken] = useState(() => sessionStorage.getItem("token") || null);
+  const [email, setEmailState] = useState(() => sessionStorage.getItem("email") || null);
   const [sessionTimer, setSessionTimer] = useState(null);
 
-  const login = (newToken, username, password, userEmail) => {
+  const login = (newToken, userEmail) => {
     setToken(newToken);
     sessionStorage.setItem("token", newToken);
     sessionStorage.setItem("email", userEmail);
-    // sessionStorage.setItem("password", password); // Comentamos el almacenamiento de la contraseña
-
-    const usernameWithoutDomain = userEmail.split("@")[0];
-    sessionStorage.setItem("username", usernameWithoutDomain);
 
     setEmailState(userEmail);
 
@@ -26,15 +21,15 @@ export const AuthProvider = ({ children }) => {
 
   const logout = () => {
     setToken(null);
-    sessionStorage.clear(); // Limpiar todo el sessionStorage al cerrar sesión
-    clearTimeout(sessionTimer); // Limpiar el temporizador
+    setEmailState(null); // Eliminar el email al hacer logout
+    sessionStorage.removeItem("token");
+    sessionStorage.removeItem("email");
+    clearTimeout(sessionTimer);
   };
 
   useEffect(() => {
     const handleUnload = () => {
-      // Limpiar sessionStorage solo cuando se cierra la ventana
-      sessionStorage.clear();
-      clearTimeout(sessionTimer); // Limpiar el temporizador
+      clearTimeout(sessionTimer);
     };
 
     window.addEventListener("unload", handleUnload);
@@ -45,12 +40,11 @@ export const AuthProvider = ({ children }) => {
 
     return () => {
       window.removeEventListener("unload", handleUnload);
-      clearTimeout(sessionTimer); // Limpiar el temporizador
+      clearTimeout(sessionTimer);
     };
   }, []);
 
   const resetSessionTimer = () => {
-    // Reiniciar el temporizador para cerrar sesión después de una hora de inactividad
     clearTimeout(sessionTimer);
     const timer = setTimeout(logout, 3600000); // 3600000 ms = 1 hora
     setSessionTimer(timer);
@@ -62,8 +56,6 @@ export const AuthProvider = ({ children }) => {
         token,
         email,
         setEmail: setEmailState,
-        setFilteredTag,
-        filteredTag,
         login,
         logout,
         resetSessionTimer,

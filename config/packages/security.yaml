@@ -44,9 +44,14 @@ security:
         - { path: ^/api/login, roles: PUBLIC_ACCESS }
         - { path: ^/api/login_check, roles: PUBLIC_ACCESS }
         - { path: ^/api/getuserinfo, roles: PUBLIC_ACCESS }
-        - { path: ^/user/me, roles: PUBLIC_ACCESS } 
-        - { path: ^/user/register,       roles: PUBLIC_ACCESS }
-        - { path: ^/api,       roles: IS_AUTHENTICATED_FULLY }
+        - { path: ^/user/me, roles: PUBLIC_ACCESS }
+        - { path: ^/user/register, roles: PUBLIC_ACCESS }
+        - { path: ^/api, roles: IS_AUTHENTICATED_FULLY }
+        - { path: ^/squad/all, roles: PUBLIC_ACCESS }
+        - { path: ^/squad/create, roles: PUBLIC_ACCESS }
+        - { path: ^/squad/\d+, roles: PUBLIC_ACCESS }
+        - { path: ^/squad/\d+/edit, roles: PUBLIC_ACCESS }
+        - { path: ^/squad/\d+/delete, roles: PUBLIC_ACCESS }
 
 when@test:
     security:

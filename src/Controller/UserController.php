@@ -3,6 +3,7 @@
 namespace App\Controller;
 
 use App\Entity\User;
+use App\Entity\Squad;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -14,6 +15,7 @@ use Lexik\Bundle\JWTAuthenticationBundle\Services\JWTTokenManagerInterface;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 use Symfony\Component\Serializer\SerializerInterface;
 use App\Repository\UserRepository;
+
 
 
 #[Route('/user', name: 'app_user')]
@@ -154,6 +156,59 @@ class UserController extends AbstractController
         return new JsonResponse($response, 200, [
             'Content-Type' => 'application/json',
         ], true);
+    }
+    #[Route('/squad/{squadId}', name: 'user_get_by_squad', methods: ['GET'])]
+    public function getUsersBySquad(int $squadId, EntityManagerInterface $entityManager): JsonResponse
+    {
+        // Obtiene el repositorio de la entidad Squad
+        $squadRepository = $entityManager->getRepository(Squad::class);
+
+        // Busca el escuadrón por su ID
+        $squad = $squadRepository->find($squadId);
+
+        // Verifica si el escuadrón existe
+        if (!$squad) {
+            return new JsonResponse(['error' => 'Squad not found'], JsonResponse::HTTP_NOT_FOUND);
+        }
+
+        // Obtiene los usuarios asociados al escuadrón
+        $users = $squad->getUser();
+
+        // Formatea los datos de los usuarios para la respuesta
+        $formattedUsers = [];
+        foreach ($users as $user) {
+            $formattedUsers[] = [
+                'id' => $user->getId(),
+                'email' => $user->getEmail(),
+                'username' => $user->getUsername(),
+                // Puedes incluir otros campos si lo deseas
+            ];
+        }
+
+        // Devuelve una respuesta JSON con los usuarios asociados al escuadrón
+        return new JsonResponse($formattedUsers);
+    }
+    #[Route('/squads/{userId}', name: 'user_squads', methods: ['GET'])]
+    public function getUserSquads(int $userId, EntityManagerInterface $entityManager): JsonResponse
+    {
+        // Obtener el repositorio de la entidad Squad
+        $squadRepository = $entityManager->getRepository(Squad::class);
+
+        // Buscar los escuadrones asociados al usuario
+        $squads = $squadRepository->findBy(['user' => $userId]);
+
+        // Formatear los datos de los escuadrones para la respuesta
+        $formattedSquads = [];
+        foreach ($squads as $squad) {
+            $formattedSquads[] = [
+                'id' => $squad->getId(),
+                'name' => $squad->getName(),
+                // Puedes incluir otros campos si lo deseas
+            ];
+        }
+
+        // Devolver una respuesta JSON con los escuadrones asociados al usuario
+        return new JsonResponse($formattedSquads);
     }
 
 }

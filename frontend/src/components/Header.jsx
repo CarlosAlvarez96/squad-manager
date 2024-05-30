@@ -29,6 +29,7 @@ const Header = () => {
     closeMenu();
   };
 
+  
   const handleAddMember = () => {
     navigate("/registMember");
     closeMenu();
@@ -49,7 +50,7 @@ const Header = () => {
 
   return (
     <div className={`bg-green-500`}>
-      <div className="flex flex-col md:flex-row justify-between items-center p-4 border-b-2">
+      <div className="flex flex-col md:flex-row justify-between items-center p-4 ">
         <div className="flex items-center">
           <h2 className={`text-4xl font-bold p-2 m-2 `}>
             Squad Manager
@@ -84,8 +85,9 @@ const Header = () => {
               onClick={handleSquad}
               className={`p-2 rounded-lg hover:bg-green-700 text-white text-lg border border-transparent focus:outline-none focus:border-green-700 focus:ring-2 focus:ring-green-700`}
             >
-              My Squad
+              Equipos
             </button>
+
             <button
               onClick={handleAddMember}
               className={`p-2 rounded-lg hover:bg-green-700 text-white text-lg border border-transparent focus:outline-none focus:border-green-700 focus:ring-2 focus:ring-green-700`}
