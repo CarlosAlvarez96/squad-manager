@@ -1,5 +1,4 @@
 <?php
-
 namespace App\Repository;
 
 use App\Entity\Squad;
@@ -39,28 +38,18 @@ class SquadRepository extends ServiceEntityRepository
         }
     }
 
-//    /**
-//     * @return Squad[] Returns an array of Squad objects
-//     */
-//    public function findByExampleField($value): array
-//    {
-//        return $this->createQueryBuilder('s')
-//            ->andWhere('s.exampleField = :val')
-//            ->setParameter('val', $value)
-//            ->orderBy('s.id', 'ASC')
-//            ->setMaxResults(10)
-//            ->getQuery()
-//            ->getResult()
-//        ;
-//    }
-
-//    public function findOneBySomeField($value): ?Squad
-//    {
-//        return $this->createQueryBuilder('s')
-//            ->andWhere('s.exampleField = :val')
-//            ->setParameter('val', $value)
-//            ->getQuery()
-//            ->getOneOrNullResult()
-//        ;
-//    }
+    /**
+     * @return Squad[] Returns an array of Squad objects associated with a user ID
+     */
+    public function findByUserId(int $userId): array
+    {
+        return $this->createQueryBuilder('s')
+            ->innerJoin('s.user', 'u')
+            ->andWhere('u.id = :userId')
+            ->setParameter('userId', $userId)
+            ->orderBy('s.id', 'ASC')
+            ->getQuery()
+            ->getResult()
+        ;
+    }
 }

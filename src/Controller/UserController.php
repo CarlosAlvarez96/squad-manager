@@ -14,6 +14,8 @@ use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 use Lexik\Bundle\JWTAuthenticationBundle\Services\JWTTokenManagerInterface;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 use Symfony\Component\Serializer\SerializerInterface;
+use App\Entity\IndividualStats;
+use App\Repository\IndividualStatsRepository;
 use App\Repository\UserRepository;
 
 
@@ -135,9 +137,25 @@ class UserController extends AbstractController
         $entityManager->persist($user);
         $entityManager->flush();
 
+        // Crear estadísticas individuales para el usuario
+        $stats = new IndividualStats();
+        $stats->setPace(0); // Puedes establecer los valores por defecto aquí
+        $stats->setShooting(0);
+        $stats->setPhysical(0);
+        $stats->setDefending(0);
+        $stats->setDribbling(0);
+        $stats->setPassing(0);
+        $stats->setPosition('default'); // o cualquier valor por defecto
+        $stats->setUser($user);
+
+        // Guarda las estadísticas individuales en la base de datos
+        $entityManager->persist($stats);
+        $entityManager->flush();
+
         // Devuelve una respuesta de éxito
-        return new JsonResponse(['message' => 'User registered successfully'], Response::HTTP_CREATED);
+        return new JsonResponse(['message' => 'User registered successfully and individual stats created'], Response::HTTP_CREATED);
     }
+
 
     #[Route('/api/getuserinfo', name: 'app_get_user_info', methods: ['POST'])]
     public function getUserInfo(SerializerInterface $serializerInterface, JWTTokenManagerInterface $jwtManagerInterface, TokenStorageInterface $tokenStorageInterface, UserRepository $userRepository): Response
@@ -188,27 +206,58 @@ class UserController extends AbstractController
         // Devuelve una respuesta JSON con los usuarios asociados al escuadrón
         return new JsonResponse($formattedUsers);
     }
-    #[Route('/squads/{userId}', name: 'user_squads', methods: ['GET'])]
-    public function getUserSquads(int $userId, EntityManagerInterface $entityManager): JsonResponse
+        
+    #[Route('/{id}/addUserByEmail', name: 'squad_add_user_by_email', methods: ['POST'])]
+    public function addUserToSquadByEmail(int $id, Request $request, EntityManagerInterface $entityManager, UserRepository $userRepository): Response
     {
-        // Obtener el repositorio de la entidad Squad
-        $squadRepository = $entityManager->getRepository(Squad::class);
+        $data = json_decode($request->getContent(), true);
 
-        // Buscar los escuadrones asociados al usuario
-        $squads = $squadRepository->findBy(['user' => $userId]);
-
-        // Formatear los datos de los escuadrones para la respuesta
-        $formattedSquads = [];
-        foreach ($squads as $squad) {
-            $formattedSquads[] = [
-                'id' => $squad->getId(),
-                'name' => $squad->getName(),
-                // Puedes incluir otros campos si lo deseas
-            ];
+        if (!isset($data['email'])) {
+            return new JsonResponse(['error' => 'Email is required'], Response::HTTP_BAD_REQUEST);
         }
 
-        // Devolver una respuesta JSON con los escuadrones asociados al usuario
-        return new JsonResponse($formattedSquads);
-    }
+        $user = $userRepository->findOneByEmail($data['email']);
 
+        if (!$user) {
+            return new JsonResponse(['error' => 'User not found'], Response::HTTP_NOT_FOUND);
+        }
+
+        $squad = $entityManager->getRepository(Squad::class)->find($id);
+
+        if (!$squad) {
+            return new JsonResponse(['error' => 'Squad not found'], Response::HTTP_NOT_FOUND);
+        }
+
+        $squad->addUser($user);
+        $entityManager->flush();
+
+        return new JsonResponse(['message' => 'User added to squad successfully'], Response::HTTP_OK);
+    }
+    #[Route('/{id}/removeUserByEmail', name: 'squad_remove_user_by_email', methods: ['POST'])]
+    public function removeUserFromSquadByEmail(int $id, Request $request, EntityManagerInterface $entityManager, UserRepository $userRepository): Response
+    {
+        $data = json_decode($request->getContent(), true);
+
+        if (!isset($data['email'])) {
+            return new JsonResponse(['error' => 'Email is required'], Response::HTTP_BAD_REQUEST);
+        }
+
+        $user = $userRepository->findOneByEmail($data['email']);
+
+        if (!$user) {
+            return new JsonResponse(['error' => 'User not found'], Response::HTTP_NOT_FOUND);
+        }
+
+        $squad = $entityManager->getRepository(Squad::class)->find($id);
+
+        if (!$squad) {
+            return new JsonResponse(['error' => 'Squad not found'], Response::HTTP_NOT_FOUND);
+        }
+
+        $squad->removeUser($user);
+        $entityManager->flush();
+
+        return new JsonResponse(['message' => 'User removed from squad successfully'], Response::HTTP_OK);
+    }
+    
 }

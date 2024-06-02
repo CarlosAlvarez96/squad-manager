@@ -11,30 +11,21 @@
   background: url("https://user-images.githubusercontent.com/22690563/67150939-14a0b180-f2c7-11e9-8016-a993a397e1c5.jpg") no-repeat center center / cover;
 } */
 
-body::after {
-  content: '@selimdoyranli';
-  font-size: 1rem;
-  color: #aaa;
-  position: fixed;
-  bottom: 20px;
-  right: 20px;
-  z-index: 2;
-}
 
 .wrapper {
   position: relative;
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 100%;
-  height: 100vh;
+  width: 50%;
+  height: 50vh;
   min-height: 500px;
 }
 
 .fut-player-card {
   position: relative;
   width: 300px;
-  height: 485px;
+  height: 450px;
   background-image: url(../src/img/card3.webp);
   background-position: center center;
   background-size: 130% 115%;

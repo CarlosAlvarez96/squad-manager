@@ -9,7 +9,12 @@ const PlayerCard = ({
   playerImage,
   extraStats,
   playerName,
-  playerFeatures
+  pace,
+  shooting,
+  physical,
+  defending,
+  dribbling,
+  passing
 }) => {
   return (
     <div className="wrapper">
@@ -33,16 +38,16 @@ const PlayerCard = ({
           <div className="player-info">
             <div className="player-name"><span>{playerName}</span></div>
             <div className="player-features">
-              {playerFeatures.map((featureCol, index) => (
-                <div className="player-features-col" key={index}>
-                  {featureCol.map((feature, subIndex) => (
-                    <span key={subIndex}>
-                      <span className="player-feature-value">{feature.value}</span>
-                      <span className="player-feature-title">{feature.title}</span>
-                    </span>
-                  ))}
-                </div>
-              ))}
+              <div className="player-features-col">
+                <span><span className="player-feature-value">{pace}</span><span className="player-feature-title">PAC</span></span>
+                <span><span className="player-feature-value">{shooting}</span><span className="player-feature-title">SHO</span></span>
+                <span><span className="player-feature-value">{passing}</span><span className="player-feature-title">PAS</span></span>
+              </div>
+              <div className="player-features-col">
+                <span><span className="player-feature-value">{dribbling}</span><span className="player-feature-title">DRI</span></span>
+                <span><span className="player-feature-value">{defending}</span><span className="player-feature-title">DEF</span></span>
+                <span><span className="player-feature-value">{physical}</span><span className="player-feature-title">PHY</span></span>
+              </div>
             </div>
           </div>
         </div>
@@ -52,36 +57,3 @@ const PlayerCard = ({
 };
 
 export default PlayerCard;
-
-// import React from 'react';
-// import PlayerCard from './PlayerCard.jsx';
-// const Squad = () => {
-//     const playerProps = {
-//         rating: 65,
-//         position: 'MC',
-//         nationImage: 'https://selimdoyranli.com/cdn/fut-player-card/img/argentina.svg',
-//         clubImage: 'https://selimdoyranli.com/cdn/fut-player-card/img/barcelona.svg',
-//         playerImage: '../src/img/fran.png',
-//         extraStats: ['4*SM', '4*WF'],
-//         playerName: 'Fran',
-//         playerFeatures: [
-//           [
-//             { value: 65, title: 'PAC' },
-//             { value: 60, title: 'SHO' },
-//             { value: 72, title: 'PAS' },
-//           ],
-//           [
-//             { value: 54, title: 'DRI' },
-//             { value: 72, title: 'DEF' },
-//             { value: 77, title: 'PHY' },
-//           ],
-//         ],
-//       };
-//     return (
-//         <div>
-//             <PlayerCard {...playerProps} />
-//         </div>
-//     );
-// };
-
-// export default Squad;

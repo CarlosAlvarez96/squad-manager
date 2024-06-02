@@ -15,16 +15,17 @@ const get = async (endpoint) => {
       accept: "application/json",
     },
   });
-  console.log(response);
   if (!response.ok) {
-    // throw new Error("Error en la petición GET al endpoint: " + endpoint);
-    throw new Error(
-      `Error en la petición GET al endpoint: ${endpoint} (${response.status} ${response.statusText})`
-    );
+    console.error(`Error en la petición GET al endpoint: ${endpoint} (${response.status} ${response.statusText})`);
+    const errorData = await response.json(); // Obtener detalles del error si están disponibles
+    console.error(errorData);
+    throw new Error(`Error en la petición GET al endpoint: ${endpoint} (${response.status} ${response.statusText})`);
   }
   const data = await response.json();
+  console.log(data);
   return data;
 };
+
 
 const post = async (endpoint, dto) => {
   const token = sessionStorage.getItem("token");
@@ -36,8 +37,9 @@ const post = async (endpoint, dto) => {
       "Content-Type": "application/json",
     },
     body: JSON.stringify(dto, replacer),
-  });
-  // console.log(JSON.stringify(dto, replacer));
+   });
+   console.log(JSON.stringify(dto, replacer));
+  //  console.log(JSON.stringify(dto, replacer));
   if (!response.ok) {
     throw new Error(
       `Error en la petición POST al endpoint: ${endpoint} (${response.status} ${response.statusText})`
@@ -53,19 +55,19 @@ const put = async (endpoint, dto) => {
     method: "PUT",
     headers: {
       Authorization: `Bearer ${token}`,
-      accept: "application/json",
       "Content-Type": "application/json",
     },
-    body: JSON.stringify(dto, replacer),
+    body: JSON.stringify(dto),
   });
   if (!response.ok) {
     throw new Error(
-      `Error en la petición POST al endpoint: ${endpoint} (${response.status} ${response.statusText})`
+      `Error en la petición PUT al endpoint: ${endpoint} (${response.status} ${response.statusText})`
     );
   }
   const data = await response.json();
   return data;
 };
+
 
 const deleteMethod = async (endpoint) => {
   const token = sessionStorage.getItem("token");

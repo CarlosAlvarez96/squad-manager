@@ -10,7 +10,7 @@ use Doctrine\Migrations\AbstractMigration;
 /**
  * Auto-generated Migration: Please modify to your needs!
  */
-final class Version20240416222358 extends AbstractMigration
+final class Version20240602183232 extends AbstractMigration
 {
     public function getDescription(): string
     {
@@ -20,12 +20,12 @@ final class Version20240416222358 extends AbstractMigration
     public function up(Schema $schema): void
     {
         // this up() migration is auto-generated, please modify it to your needs
-        $this->addSql('ALTER TABLE participant_stats RENAME INDEX idx_96f2ce132a0d9c9e TO IDX_96F2CE139D1C3019');
+        $this->addSql('ALTER TABLE individual_stats ADD player_image_url VARCHAR(255) DEFAULT NULL, ADD nation_image_url VARCHAR(255) DEFAULT NULL, ADD club_image_url VARCHAR(255) DEFAULT NULL');
     }
 
     public function down(Schema $schema): void
     {
         // this down() migration is auto-generated, please modify it to your needs
-        $this->addSql('ALTER TABLE participant_stats RENAME INDEX idx_96f2ce139d1c3019 TO IDX_96F2CE132A0D9C9E');
+        $this->addSql('ALTER TABLE individual_stats DROP player_image_url, DROP nation_image_url, DROP club_image_url');
     }
 }

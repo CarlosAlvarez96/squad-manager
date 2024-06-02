@@ -8,7 +8,7 @@ const SquadDetail = () => {
   const [users, setUsers] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [newUserId, setNewUserId] = useState('');
+  const [newUserEmail, setNewUserEmail] = useState('');
   const [successMessage, setSuccessMessage] = useState('');
   const [errorMessage, setErrorMessage] = useState('');
 
@@ -39,11 +39,9 @@ const SquadDetail = () => {
 
   const handleAddUserToSquad = async () => {
     try {
-      // Llama al método POST de ApiService para añadir un usuario al escuadrón
-      await post(`/squad/${id}/addUser/${newUserId}`);
+      await post(`/user/${id}/addUserByEmail`, { email: newUserEmail });
       setSuccessMessage('User added to squad successfully');
-      setNewUserId('');
-      // Vuelve a cargar la lista de usuarios después de agregar uno nuevo
+      setNewUserEmail('');
       await fetchUsersBySquadId(id);
     } catch (error) {
       setErrorMessage(error.message);
@@ -54,29 +52,37 @@ const SquadDetail = () => {
   if (error) return <p>Error loading squad details: {error.message}</p>;
 
   return (
-    <div className='bg-white'>
-      <h2>Squad Detail</h2>
-      <p>ID: {squad.id}</p>
-      <p>Name: {squad.name}</p>
-      <div>
-        <h3>Users in Squad</h3>
+    <div className="container mx-auto p-6 m-6 bg-white rounded-lg shadow-lg ">
+      <h2 className="text-3xl font-bold mb-6">Mi squad</h2>
+      <div className="bg-white rounded-lg shadow-lg p-6 mb-6">
+        <p className="text-xl font-semibold mb-2">ID: {squad.id}</p>
+        <p className="text-xl font-semibold mb-2">Name: {squad.name}</p>
+      </div>
+      <div className="bg-white rounded-lg shadow-lg p-6 mb-6">
+        <h3 className="text-2xl font-bold mb-4">Miembros del squad</h3>
         <ul>
           {users.map(user => (
-            <li key={user.id}>{user.username}</li>
+            <li key={user.id} className="text-lg">{user.username}</li>
           ))}
         </ul>
       </div>
-      <div>
-        <h3>Add User to Squad</h3>
+      <div className="bg-white rounded-lg shadow-lg p-6 mb-6">
+        <h3 className="text-2xl font-bold mb-4">Add User to Squad</h3>
         <input
           type="text"
-          value={newUserId}
-          onChange={(e) => setNewUserId(e.target.value)}
-          placeholder="Enter User ID"
+          value={newUserEmail}
+          onChange={(e) => setNewUserEmail(e.target.value)}
+          placeholder="Enter User Email"
+          className="border border-gray-300 rounded-lg px-4 py-2 mb-4"
         />
-        <button onClick={handleAddUserToSquad}>Add User</button>
-        {successMessage && <p>{successMessage}</p>}
-        {errorMessage && <p>{errorMessage}</p>}
+        <button
+          onClick={handleAddUserToSquad}
+          className="bg-blue-500 text-white font-semibold px-6 py-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+        >
+          Add User
+        </button>
+        {successMessage && <p className="text-green-500 mt-2">{successMessage}</p>}
+        {errorMessage && <p className="text-red-500 mt-2">{errorMessage}</p>}
       </div>
     </div>
   );

@@ -41,52 +41,38 @@ class IndividualStatsController extends AbstractController
         // Devuelve una respuesta JSON con todos los registros de IndividualStats
         return new JsonResponse($formattedStats);
     }
-
-    #[Route('/create', name: 'individual_stats_create', methods: ['POST'])]
-    public function createIndividualStats(Request $request, EntityManagerInterface $entityManager): Response
+    #[Route('/create', name: 'create_individual_stats', methods: ['POST'])]
+    public function createIndividualStats(Request $request, EntityManagerInterface $entityManager): JsonResponse
     {
-        // Obtiene los datos del cuerpo de la solicitud
         $data = json_decode($request->getContent(), true);
 
-        // Crea una nueva instancia de la entidad IndividualStats
         $stats = new IndividualStats();
         $stats->setPace($data['pace'] ?? null);
         $stats->setShooting($data['shooting'] ?? null);
         $stats->setPhysical($data['physical'] ?? null);
         $stats->setDefending($data['defending'] ?? null);
         $stats->setDribbling($data['dribbling'] ?? null);
-        $stats->setPassing($data['passing'] ?? null);
+        $stats->setPassing($data['passing']);
         $stats->setPosition($data['position'] ?? null);
 
-        // Verifica si se proporcionó un ID de usuario y lo asocia si es así
-        if (isset($data['user_id'])) {
-            $user = $entityManager->getRepository(User::class)->find($data['user_id']);
-            if (!$user) {
-                return new JsonResponse(['error' => 'User not found'], Response::HTTP_NOT_FOUND);
-            }
-            $stats->setUser($user);
-        }
+        $user = $entityManager->getRepository(User::class)->find($data['user_id']);
+        $stats->setUser($user);
 
-        // Guarda las estadísticas individuales en la base de datos
         $entityManager->persist($stats);
         $entityManager->flush();
 
-        // Devuelve una respuesta de éxito
-        return new JsonResponse(['message' => 'IndividualStats created successfully'], Response::HTTP_CREATED);
+        return new JsonResponse(['message' => 'Individual stats created successfully'], JsonResponse::HTTP_CREATED);
     }
 
-    #[Route('/{id}', name: 'individual_stats_get', methods: ['GET'])]
-    public function getIndividualStatsById(int $id, IndividualStatsRepository $individualStatsRepository): JsonResponse
+    #[Route('/user/{userId<\d+>}', name: 'individual_stats_by_user', methods: ['GET'])]
+    public function getIndividualStatsByUserId(int $userId, IndividualStatsRepository $individualStatsRepository): JsonResponse
     {
-        // Busca las estadísticas individuales por su ID
-        $stats = $individualStatsRepository->find($id);
+        $stats = $individualStatsRepository->findOneBy(['user' => $userId]);
 
-        // Verifica si las estadísticas individuales existen
         if (!$stats) {
-            return new JsonResponse(['error' => 'IndividualStats not found'], Response::HTTP_NOT_FOUND);
+            return new JsonResponse(null, JsonResponse::HTTP_NOT_FOUND);
         }
 
-        // Formatea los datos de las estadísticas individuales para la respuesta
         $formattedStats = [
             'id' => $stats->getId(),
             'pace' => $stats->getPace(),
@@ -99,25 +85,44 @@ class IndividualStatsController extends AbstractController
             'user_id' => $stats->getUser() ? $stats->getUser()->getId() : null,
         ];
 
-        // Devuelve una respuesta JSON con las estadísticas individuales encontradas
         return new JsonResponse($formattedStats);
     }
 
-    #[Route('/{id}', name: 'individual_stats_update', methods: ['PUT'])]
-    public function updateIndividualStats(int $id, Request $request, EntityManagerInterface $entityManager): Response
+    #[Route('/{id<\d+>}', name: 'individual_stats_get', methods: ['GET'])]
+    public function getIndividualStatsById(int $id, IndividualStatsRepository $individualStatsRepository): JsonResponse
     {
-        // Obtiene los datos del cuerpo de la solicitud
-        $data = json_decode($request->getContent(), true);
+        $stats = $individualStatsRepository->find($id);
 
-        // Busca las estadísticas individuales por su ID
-        $stats = $entityManager->getRepository(IndividualStats::class)->find($id);
-
-        // Verifica si las estadísticas individuales existen
         if (!$stats) {
-            return new JsonResponse(['error' => 'IndividualStats not found'], Response::HTTP_NOT_FOUND);
+            return new JsonResponse(['error' => 'IndividualStats not found'], JsonResponse::HTTP_NOT_FOUND);
         }
 
-        // Actualiza las estadísticas individuales con los datos proporcionados
+        $formattedStats = [
+            'id' => $stats->getId(),
+            'pace' => $stats->getPace(),
+            'shooting' => $stats->getShooting(),
+            'physical' => $stats->getPhysical(),
+            'defending' => $stats->getDefending(),
+            'dribbling' => $stats->getDribbling(),
+            'passing' => $stats->getPassing(),
+            'position' => $stats->getPosition(),
+            'user_id' => $stats->getUser() ? $stats->getUser()->getId() : null,
+        ];
+
+        return new JsonResponse($formattedStats);
+    }
+
+    #[Route('/{id<\d+>}', name: 'individual_stats_update', methods: ['POST'])]
+    public function updateIndividualStats(int $id, Request $request, EntityManagerInterface $entityManager): JsonResponse
+    {
+        $data = json_decode($request->getContent(), true);
+
+        $stats = $entityManager->getRepository(IndividualStats::class)->find($id);
+
+        if (!$stats) {
+            return new JsonResponse(['error' => 'IndividualStats not found'], JsonResponse::HTTP_NOT_FOUND);
+        }
+
         if (isset($data['pace'])) {
             $stats->setPace($data['pace']);
         }
@@ -142,15 +147,13 @@ class IndividualStatsController extends AbstractController
         if (isset($data['user_id'])) {
             $user = $entityManager->getRepository(User::class)->find($data['user_id']);
             if (!$user) {
-                return new JsonResponse(['error' => 'User not found'], Response::HTTP_NOT_FOUND);
+                return new JsonResponse(['error' => 'User not found'], JsonResponse::HTTP_NOT_FOUND);
             }
             $stats->setUser($user);
         }
 
-        // Actualiza las estadísticas individuales en la base de datos
         $entityManager->flush();
 
-        // Devuelve una respuesta de éxito
-        return new JsonResponse(['message' => 'IndividualStats updated successfully'], Response::HTTP_OK);
+        return new JsonResponse(['message' => 'IndividualStats updated successfully'], JsonResponse::HTTP_OK);
     }
 }

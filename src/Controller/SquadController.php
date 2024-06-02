@@ -3,12 +3,16 @@
 namespace App\Controller;
 
 use App\Entity\Squad;
+use App\Repository\SquadRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
+use Psr\Log\LoggerInterface;
+
+
 use App\Entity\User;
 #[Route('/squad', name: 'app_squad')]
 class SquadController extends AbstractController
@@ -36,40 +40,33 @@ class SquadController extends AbstractController
         return new JsonResponse($formattedSquads);
     }
 
-    #[Route('/create', name: 'squad_create', methods: ['POST'])]
-    public function createSquad(Request $request, EntityManagerInterface $entityManager): Response
+    #[Route('/create/{userId}', name: 'squad_create', methods: ['POST'])]
+    public function createSquad(int $userId, Request $request, EntityManagerInterface $entityManager): Response
     {
-        // Obtiene los datos del cuerpo de la solicitud
         $data = json_decode($request->getContent(), true);
 
-        // Verifica si se ha proporcionado el nombre de la escuadra
         if (!isset($data['name'])) {
             return new JsonResponse(['error' => 'Squad name is required'], Response::HTTP_BAD_REQUEST);
         }
 
-        // Crea una nueva instancia de la entidad Squad
         $squad = new Squad();
         $squad->setName($data['name']);
 
-        // Obtiene el usuario que está realizando la solicitud (puedes adaptar este código según la autenticación y el sistema de usuarios de tu aplicación)
-        $user = $this->getUser(); // Este método puede variar dependiendo del sistema de autenticación que estés utilizando
+        $userRepository = $entityManager->getRepository(User::class);
+        $user = $userRepository->find($userId);
 
-        // Verifica si se pudo obtener el usuario
         if (!$user) {
             return new JsonResponse(['error' => 'User not found'], Response::HTTP_BAD_REQUEST);
         }
 
-        // Añade el usuario al squad
         $squad->addUser($user);
 
-        // Guarda la escuadra en la base de datos
         $entityManager->persist($squad);
         $entityManager->flush();
 
-        // Devuelve una respuesta de éxito
-        return new JsonResponse(['message' => 'Squad created successfully'], Response::HTTP_CREATED);
+        // Devuelve la respuesta JSON con el ID del escuadrón creado
+        return new JsonResponse(['message' => 'Squad created successfully', 'squadId' => $squad->getId()], Response::HTTP_CREATED);
     }
-
 
     #[Route('/{id}', name: 'squad_get', methods: ['GET'])]
     public function getSquadById(int $id, EntityManagerInterface $entityManager): JsonResponse
@@ -214,4 +211,35 @@ class SquadController extends AbstractController
         // Devuelve una respuesta de éxito
         return new JsonResponse(['message' => 'User removed from squad successfully'], Response::HTTP_OK);
     }
+    #[Route('/squads/{userId}', name: 'user_squads', methods: ['GET'])]
+    public function getUserSquads(int $userId, SquadRepository $squadRepository, LoggerInterface $logger): JsonResponse
+    {
+        // Log para depuración
+        $logger->info("Fetching squads for user ID: " . $userId);
+
+        try {
+            // Buscar los escuadrones asociados al usuario usando el método personalizado
+            $squads = $squadRepository->findByUserId($userId);
+
+            
+
+            // Formatear los datos de los escuadrones para la respuesta
+            $formattedSquads = [];
+            foreach ($squads as $squad) {
+                $formattedSquads[] = [
+                    'id' => $squad->getId(),
+                    'name' => $squad->getName(),
+                    // Puedes incluir otros campos si lo deseas
+                ];
+            }
+
+            // Devolver una respuesta JSON con los escuadrones asociados al usuario
+            return new JsonResponse($formattedSquads);
+        } catch (\Exception $e) {
+            // Log del error
+            $logger->error("Error fetching squads: " . $e->getMessage());
+            return new JsonResponse(['error' => 'Internal Server Error'], 500);
+        }
+    }
+
 }

@@ -46,10 +46,12 @@ const Login = () => {
 
       const userData = await userResponse.json();
       const userEmail = userData.email || 'default@example.com';
+      const userId = userData.id;
       setAuthEmail(userEmail);
 
-      // Guardar email en el almacenamiento local
+      // Guardar email y userId en el almacenamiento local
       localStorage.setItem('email', userEmail);
+      sessionStorage.setItem('userId', userId);
 
       Swal.fire({
         icon: 'success',

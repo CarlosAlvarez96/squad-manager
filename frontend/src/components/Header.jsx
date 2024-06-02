@@ -30,8 +30,13 @@ const Header = () => {
   };
 
   
-  const handleAddMember = () => {
-    navigate("/registMember");
+  const handleMyStats = () => {
+    navigate("/stats");
+    closeMenu();
+  };
+
+  const handleGames = () => {
+    navigate("/game");
     closeMenu();
   };
 
@@ -89,10 +94,16 @@ const Header = () => {
             </button>
 
             <button
-              onClick={handleAddMember}
+              onClick={handleMyStats}
               className={`p-2 rounded-lg hover:bg-green-700 text-white text-lg border border-transparent focus:outline-none focus:border-green-700 focus:ring-2 focus:ring-green-700`}
             >
-              Add member
+              Estadísitcas
+            </button>
+            <button
+              onClick={handleGames}
+              className={`p-2 rounded-lg hover:bg-green-700 text-white text-lg border border-transparent focus:outline-none focus:border-green-700 focus:ring-2 focus:ring-green-700`}
+            >
+              Partidos
             </button>
             {!token && (
               <div>

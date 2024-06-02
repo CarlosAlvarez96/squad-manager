@@ -37,6 +37,15 @@ class IndividualStats
     #[ORM\OneToOne(inversedBy: 'individualStats', cascade: ['persist', 'remove'])]
     private ?User $user = null;
 
+    #[ORM\Column(length: 255, nullable: true)]
+    private ?string $playerImageUrl = null;
+
+    #[ORM\Column(length: 255, nullable: true)]
+    private ?string $nationImageUrl = null;
+
+    #[ORM\Column(length: 255, nullable: true)]
+    private ?string $clubImageUrl = null;
+
  
 
     public function getId(): ?int
@@ -136,6 +145,42 @@ class IndividualStats
     public function setUser(?User $user): self
     {
         $this->user = $user;
+
+        return $this;
+    }
+
+    public function getPlayerImageUrl(): ?string
+    {
+        return $this->playerImageUrl;
+    }
+
+    public function setPlayerImageUrl(?string $playerImageUrl): static
+    {
+        $this->playerImageUrl = $playerImageUrl;
+
+        return $this;
+    }
+
+    public function getNationImageUrl(): ?string
+    {
+        return $this->nationImageUrl;
+    }
+
+    public function setNationImageUrl(?string $nationImageUrl): static
+    {
+        $this->nationImageUrl = $nationImageUrl;
+
+        return $this;
+    }
+
+    public function getClubImageUrl(): ?string
+    {
+        return $this->clubImageUrl;
+    }
+
+    public function setClubImageUrl(?string $clubImageUrl): static
+    {
+        $this->clubImageUrl = $clubImageUrl;
 
         return $this;
     }
